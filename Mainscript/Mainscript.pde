@@ -1,18 +1,24 @@
+ArrayList<Segment> segments;
 float radiusCircle;
 float lenSegment;
-float primaryAngle;
-float secondaryAngle;
+float incrementAngle;
 int nbrSegments;
-boolean complete;
 
 void setup(){
   size(600, 600);
   radiusCircle = 70;
   lenSegment = 20;
-  primaryAngle = 0;
-  secondaryAngle = 0;
   nbrSegments = 10;
-  complete = false;
+  incrementAngle = 2*PI/nbrSegments;
+  segments = new ArrayList<Segment>();
+  Segment segment = new Segment(lenSegment, radiusCircle, incrementAngle, true);
+  segments.add(segment);
+  for(int i=1; i<nbrSegments; i++){
+    segment = new Segment();
+    segments.add(segment);
+    segments.get(i).setPrecedent(segments.get(i-1));
+  }
+  segments.get(0).setPrecedent(segments.get(nbrSegments-1));
 }
 
 void draw(){
@@ -23,25 +29,8 @@ void draw(){
   stroke(255);
   strokeWeight(3);
  
-  rotate(primaryAngle);
-  
-  translate(0, -radiusCircle);
-  rotate(secondaryAngle);
-  line(-(lenSegment/2), 0, lenSegment/2, 0);
-  rotate(-secondaryAngle);
-  translate(0, radiusCircle);
-  secondaryAngle += PI/30;
-  if(secondaryAngle > PI){
-    secondaryAngle = 0;
-    complete = true;
-  }
-  
-  for(int i=1; i<nbrSegments; i++){
-    rotate(2*PI/nbrSegments);
-    line(-(lenSegment/2), -radiusCircle, (lenSegment/2), -radiusCircle);
-  }
-  if(complete){
-    complete = false;
-    primaryAngle += 2*PI/nbrSegments;
+  for(Segment segment : segments){
+    segment.update();
+    segment.display();
   }
 }
